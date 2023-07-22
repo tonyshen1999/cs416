@@ -8,8 +8,8 @@
 async function init() {
    const data = await d3.csv('./inflation.csv');
     console.log(data)
-    var x = d3.scaleLog().domain([10, 150]).range([ 0, 200 ]);
-    var y = d3.scaleLog().domain([10, 150]).range([ 200, 0 ]);
+    var x = d3.scaleLinear().domain([1960, 2023]).range([ 0, 200 ]);
+    var y = d3.scaleLinear().domain([0, 15]).range([ 200, 0 ]);
     var y_axis = d3.axisLeft(y).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")); 
     var x_axis = d3.axisBottom(x).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")); 
 
@@ -20,7 +20,7 @@ async function init() {
         .enter()
         .append('circle')
         .attr('cx',function(d,i) {return x(parseInt(d.YEAR));})
-        .attr('cy',function(d,i) {return y(parseFloat(d.YEAR));})
+        .attr('cy',function(d,i) {return y(parseFloat(d.ROUNDED));})
         
         .attr('r', 1)
 
