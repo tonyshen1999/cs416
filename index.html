@@ -20,7 +20,7 @@ async function init() {
         .enter()
         .append('circle')
         .attr('cx',function(d,i) {return x(parseInt(d.YEAR));})
-        .attr('cy',function(d,i) {return y(parseFloat(d.INFLATION));})
+        .attr('cy',function(d,i) {return console.log(d.INFLATION) y(parseFloat(d.INFLATION));})
         
         .attr('r', 1)
 
