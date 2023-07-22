@@ -6,8 +6,33 @@
 </svg>
 <script>
 async function init() {
-    const data = await d3.csv('./inflation.csv');
+   const data = await d3.csv('./inflation.csv');
     console.log(data)
+    var x = d3.scaleLog().domain([10, 150]).range([ 0, 200 ]);
+    var y = d3.scaleLog().domain([10, 150]).range([ 200, 0 ]);
+    var y_axis = d3.axisLeft(y).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")); 
+    var x_axis = d3.axisBottom(x).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")); 
+
+    d3.select('svg').append('g')
+        .attr('transform','translate(50,50)')
+        .selectAll('circle')
+        .data(data)
+        .enter()
+        .append('circle')
+        .attr('cx',function(d,i) {return x(+d.YEAR);})
+        .attr('cy',function(d,i) {return y(+d.INFLATION);})
+        
+        .attr('r', 1)
+
+    d3.select('svg').append('g')
+    .attr('transform','translate(50,50)')
+    .call(y_axis)
+
+
+    d3.select('svg').append('g')
+    .attr('transform','translate(50,250)')
+    .call(x_axis)
+
 }
 </script>
 </body>
