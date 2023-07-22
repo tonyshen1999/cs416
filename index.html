@@ -1,0 +1,15 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style> circle {fill: lightblue; stroke: black;} </style>
+<body onload='init()'>
+<svg width=300 height=300>
+</svg>
+<script>
+async function init() {
+    const data = await d3.csv('https://github.com/tonyshen1999/cs416/blob/main/inflation.csv');
+    console.log(data)
+}
+</script>
+</body>
+</html>
+
