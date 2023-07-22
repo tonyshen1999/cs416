@@ -19,8 +19,8 @@ async function init() {
         .data(data)
         .enter()
         .append('circle')
-        .attr('cx',function(d,i) {return x(+d.YEAR);})
-        .attr('cy',function(d,i) {return y(+d.INFLATION);})
+        .attr('cx',function(d,i) {return x(parseInt(d.YEAR));})
+        .attr('cy',function(d,i) {return y(parseFloat(d.INFLATION));})
         
         .attr('r', 1)
 
