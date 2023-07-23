@@ -61,7 +61,14 @@ async function init(){
   const data2 = await d3.csv('./house_rates.csv');
   const data3 = await d3.csv('./tbill_rates.csv');
   const data4 = await d3.csv('./sp500_rates.csv');
-  dataSets = [data1,data2,data3,data4];
+  console.log(data1);
+  console.log(data2);
+  console.log(data3);
+  console.log(data4);
+  dataSets.push(data1);
+  dataSets.push(data2);
+  dataSets.push(data3);
+  dataSets.push(data4);
 }
 
 console.log(dataSets);
