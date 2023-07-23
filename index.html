@@ -55,7 +55,7 @@ Data set:
 let index = 0;
 let dataSets = [];
 
-function async init(){
+async function init(){
   const data1 = await d3.csv('./inflation.csv');
 
   const data2 = await d3.csv('./house_rates.csv');
