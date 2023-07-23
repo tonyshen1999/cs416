@@ -11,7 +11,7 @@ async function init() {
     var x = d3.scaleLinear().domain([1998, 2023]).range([ 0, 1400 ]);
     var y = d3.scaleLinear().domain([0, 15]).range([ 500, 0 ]);
     var y_axis = d3.axisLeft(y).ticks(15).tickFormat(d3.format("~s")); 
-    var x_axis = d3.axisBottom(x).ticks(25); 
+    var x_axis = d3.axisBottom(x).ticks(25).tickFormat(d3.format(".0f")); 
 
     d3.select('svg').append('g')
         .attr('transform','translate(50,50)')
