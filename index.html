@@ -8,21 +8,21 @@
 async function init() {
    const data = await d3.csv('./inflation.csv');
     console.log(data)
-    var x = d3.scaleLinear().domain([1960, 2023]).range([ 0, 1400 ]);
+    var x = d3.scaleLinear().domain([1998, 2023]).range([ 0, 1400 ]);
     var y = d3.scaleLinear().domain([0, 15]).range([ 500, 0 ]);
-    var y_axis = d3.axisLeft(y).tickValues([0,15]).tickFormat(d3.format("~s")); 
-    var x_axis = d3.axisBottom(x).ticks(63); 
+    var y_axis = d3.axisLeft(y).ticks(15).tickFormat(d3.format("~s")); 
+    var x_axis = d3.axisBottom(x).ticks(25); 
 
     d3.select('svg').append('g')
         .attr('transform','translate(50,50)')
-        .selectAll('circle')
         .data(data)
         .enter()
-        .append('circle')
-        .attr('cx',function(d,i) {return x(parseInt(d.YEAR));})
-        .attr('cy',function(d,i) {return y(parseFloat(d.ROUNDED));})
-        
-        .attr('r', 1)
+        .append("rect")
+        .attr("x", function(d) { return x(d.YEAR); })
+        .attr("y", function(d) { return y(d.ROUNDED); })
+        .attr("width", x.bandwidth())
+        .attr("height", function(d) { return height - y(d.Value); })
+        .attr("fill", "#69b3a2")
 
     d3.select('svg').append('g')
     .attr('transform','translate(50,50)')
