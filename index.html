@@ -1,42 +1,415 @@
 <html>
 <script src='https://d3js.org/d3.v5.min.js'></script>
-<style> circle {fill: lightblue; stroke: black;} </style>
-<body onload='init()'>
-<svg width=1500 height=600>
-</svg>
+<script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+
+<style> 
+  circle {fill: lightblue; stroke: black;} 
+  .slider-container {
+      width: 300px;
+      margin: 20px auto;
+    }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .slider-labels span {
+    flex: 1;
+    text-align: center;
+  }
+</style>
+<body>
+    <h1 id = "scene-title">Inflation Rate By Year (1998 - 2022)</h1>
+    <div id="tooltip" style="position: absolute; display: none; background-color:white; padding: 5px; border: 2px solid black; font-size: 12px;"></div>
+    <svg width=1500 height=600>
+    </svg>
+    <br>
+    <p id ="caption-text"></p>
+    <div id="slider-container" style = "display: none">
+      <div class="slider-container" >
+        <div class="slider-value" id="slider-value">Year: 2022</div>
+        <input type="range" min="1998" max="2022" value="2022" step="1" id="year-slider" >
+      </div>
+      
+      <ol>
+        <li id="i-rate-desc"></li>
+        <li id="h-rate-desc"></li>
+        <li id="b-rate-desc"></dt>
+        <li id="m-rate-desc"></li>
+      </ol>
+    </div>
+    <button id="previous-btn" style="display: none">Previous</button>
+    <button id="next-btn">Next</button>
+    
 <script>
-async function init() {
-   const data = await d3.csv('./inflation.csv');
-   const data1 = await d3.csv('./house_rates.csv');
-   dataSets = [data,data1]
-   
-    console.log(dataSets)
-    var x = d3.scaleLinear().domain([1998, 2023]).range([ 0, 1400 ]);
-    var y = d3.scaleLinear().domain([0, 15]).range([ 500, 0 ]);
-    var y_axis = d3.axisLeft(y).ticks(15).tickFormat(d3.format("~s")); 
-    var x_axis = d3.axisBottom(x).ticks(25).tickFormat(d3.format(".0f")); 
+/*
 
-    d3.select('svg').append('g')
-        .attr('transform','translate(50,50)')
-        .selectAll('circle')
-        .data(data)
-        .enter()
-        .append('circle')
-        .attr('cx',function(d,i) {return x(+d.YEAR);})
-        .attr('cy',function(d,i) {return y(+d.ROUNDED);})
-        .attr('r', 1)
+Data set:
+[0] -> Inflation Rate (1998 - 2022)
+[1] -> Real Estate Appreciation Rate (1998 - 2022)
+[2] -> Stock Market Returns (1998 - 2022)
+[3] -> 3 Month Government T Bill Rates (1998 - 2022)
+[4] -> S&P 500 Yearly  Returns (1998 - 2022)
+
+*/
+let index = 0;
+const data1 = await d3.csv('./inflation.csv');
+
+const data2 = 
+[
+      { year: 1998, value: 120 },
+      { year: 1999, value: 150 },
+      { year: 2000, value: 250 },
+      { year: 2001, value: 110 },
+      { year: 2002, value: 220 },
+      { year: 2003, value: 100 },
+      { year: 2004, value: 160 },
+      { year: 2005, value: 270 },
+      { year: 2006, value: 180 },
+      { year: 2007, value: 280 },
+      { year: 2008, value: 100 },
+      { year: 2009, value: 240 },
+      { year: 2010, value: 180 },
+      { year: 2011, value: 250 },
+      { year: 2012, value: 600 },
+      { year: 2013, value: 100 },
+      { year: 2014, value: 150 },
+      { year: 2015, value: 250 },
+      { year: 2016, value: 180 },
+      { year: 2017, value: 240 },
+      { year: 2018, value: 600 },
+      { year: 2019, value: 200 },
+      { year: 2020, value: 170 },
+      { year: 2021, value: 220 },
+      { year: 2022, value: 540 },
+    ];
+const data3 = 
+[
+      { year: 1998, value: 300 },
+      { year: 1999, value: 250 },
+      { year: 2000, value: 240 },
+      { year: 2001, value: 110 },
+      { year: 2002, value: 150 },
+      { year: 2003, value: 200 },
+      { year: 2004, value: 750 },
+      { year: 2005, value: 500 },
+      { year: 2006, value: 480 },
+      { year: 2007, value: 350 },
+      { year: 2008, value: 100 },
+      { year: 2009, value: 300 },
+      { year: 2010, value: 780 },
+      { year: 2011, value: 250 },
+      { year: 2012, value: 300 },
+      { year: 2013, value: 100 },
+      { year: 2014, value: 450 },
+      { year: 2015, value: 200 },
+      { year: 2016, value: 200 },
+      { year: 2017, value: 250 },
+      { year: 2018, value: 300 },
+      { year: 2019, value: 400 },
+      { year: 2020, value: 180 },
+      { year: 2021, value: 150 },
+      { year: 2022, value: 200 },
+    ];
+const data4 = 
+[
+      { year: 1998, value: 200 },
+      { year: 1999, value: 150 },
+      { year: 2000, value: 240 },
+      { year: 2001, value: 410 },
+      { year: 2002, value: 150 },
+      { year: 2003, value: 250 },
+      { year: 2004, value: 160 },
+      { year: 2005, value: 550 },
+      { year: 2006, value: 440 },
+      { year: 2007, value: 350 },
+      { year: 2008, value: 150 },
+      { year: 2009, value: 360 },
+      { year: 2010, value: 180 },
+      { year: 2011, value: 250 },
+      { year: 2012, value: 300 },
+      { year: 2013, value: 120 },
+      { year: 2014, value: 450 },
+      { year: 2015, value: 250 },
+      { year: 2016, value: 250 },
+      { year: 2017, value: 220 },
+      { year: 2018, value: 310 },
+      { year: 2019, value: 400 },
+      { year: 2020, value: 110 },
+      { year: 2021, value: 150 },
+      { year: 2022, value: 220 },
+    ];
+const dataSets = [data1,data2,data3,data4];
+const titles = [
+    "Inflation Rate By Year",
+    "Real Estate Yearly Appreciation Rates Per Year",
+    "US Government 3 Month T Bill Rates Per Year",
+    "S&P 500 Index Returns Per Year",
+    "Comparison of Rates"
+]
+const captions = [
+  "The inflation rate represents how prices in general increase year over year. The data is pulled from FRED Economic Data and originates from the World Bank.",
+  "The real estate yearly appreciation rate represents the average rate of increase in property value. The original data pulled from the Federal Housing Finance Agency shows the Housing Price Index (HPI) each year and the appreciate rate is determine by computing the percentage increase in HPI year by year",
+  "The US Government 3 month t bill rate represents the yearly return from investing in a 3 month government t bill. Due to the stability of the US Government, this rate can also be used as a baseline for a relatively risk free rate of return",
+  "The S&P 500 index represents the rate of return from investing in a portfolio comprised of S&P's top 500 companies",
+  "This bar chart allows users to focus on a particular year and compare the rates relative to each other. The inflation premium represents the rate of return over the rate of inflation"
+]
+const slider = document.getElementById("year-slider");
+const sliderValueDisplay = document.getElementById("slider-value");
 
 
-    d3.select('svg').append('g')
-    .attr('transform','translate(50,50)')
-    .call(y_axis)
+function updateYearSliderText() {
+      sliderValueDisplay.textContent = "Year: " + slider.value;
+      updateBarChart(getBarChartByYear(+slider.value))
+}
 
 
-    d3.select('svg').append('g')
-    .attr('transform','translate(50,550)')
-    .call(x_axis)
+function updateTitle(index){
+    console.log("changing title");
+    document.getElementById("scene-title").textContent=titles[index];
+    document.getElementById("caption-text").textContent = captions[index];
+}
+function findRate(year, data){
+  
+
+  for (const element of data) {
+    if (element.year == year){
+      return element.value
+    }
+  }
+
+  return 0
+}
+
+
+function updateLineChartData(data){
+    
+    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const width = 1500 - margin.left - margin.right;
+    const height = 600 - margin.top - margin.bottom;
+    
+    d3.select("svg").selectAll("*").remove();
+    document.getElementById("slider-container").style.display = "none";
+
+
+    const svg = d3.select("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    const x = d3.scaleLinear()
+      .domain([d3.min(data, d => d.year), d3.max(data, d => d.year)])
+      // .domain([2010,2015])
+      .range([0, width]);
+
+    const y = d3.scaleLinear()
+      .domain([d3.min(data, d => d.value), d3.max(data, d => d.value)])
+      .range([height, 0]);
+
+    const line = d3.line()
+      .x(d => x(d.year))
+      .y(d => y(d.value));
+
+
+      var marketCrashAnnotation = [
+        {
+          note: {
+            label: "Housing Market Crash",
+            title: "2008 Housing Market Crash"
+          },
+          x: margin.left+x(2008),
+          y:  margin.top+y(findRate(2008,data)),
+          dy: -100,
+          dx: 0
+        }
+      ]
+      var covidAnnotation = [
+        {
+          note: {
+            label: "Covid Pandemic",
+            title: "2020 Covid-19 Pandemic"
+          },
+          x: margin.left+x(2020),
+          y:  margin.top+y(findRate(2020,data)),
+          dy: -100,
+          dx: 0
+        }
+      ]
+    
+    // const makeAnnotations = d3.annotation()
+    //   .annotations(marketCrashAnnotation)
+    //   .annotations(covidAnnotation)
+    
+    
+    d3.select("svg")
+      .append("g")
+      .call(d3.annotation().annotations(marketCrashAnnotation))
+    d3.select("svg")
+      .append("g")
+      .call(d3.annotation().annotations(covidAnnotation))
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", line);
+
+    svg.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+    svg.append("g")
+      .attr("class", "y-axis")
+      .call(d3.axisLeft(y));
+    
+    
+}
+
+function getBarChartByYear(year){
+
+  data = [
+    {rate:"Inflation Rate",value:dataSets[0][year-1998].value, year:dataSets[0][year-1998].year},
+    {rate:"Real Estate Appreciation Rate",value:dataSets[1][year-1998].value,year:dataSets[1][year-1998].year},
+    {rate:"US Government 3 Month T Bill Rate",value:dataSets[2][year-1998].value,year:dataSets[2][year-1998].year},
+    {rate:"S&P 500 Index Rate",value:dataSets[3][year-1998].value,year:dataSets[3][year-1998].year}
+  ]
+
+  return data
+}
+
+function updateBarChart(data){
+
+  const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+  const width = 1000 - margin.left - margin.right;
+  const height = 600 - margin.top - margin.bottom;
+  document.getElementById("slider-container").style.display = "block";
+  d3.select("svg").selectAll("*").remove();
+
+  const svg = d3.select("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  const x = d3.scaleBand()
+    .domain([data[0].rate,data[1].rate,data[2].rate,data[3].rate])
+    .range([0, width])
+    .padding(0.1);
+
+  const y = d3.scaleLinear()
+    .domain([d3.min(data, d => d.value)-5, d3.max(data, d => d.value)])
+    .range([height, 0]);
+  // const color = d3.scaleBand()
+  //   .domain([data[0].rate,data[1].rate,data[2].rate,data[3].rate])
+  //   .range(["orange","red","white","blue"])
+  const colors = ["orange","red","purple","blue"];
+
+  svg.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+    .attr("class", "bar")
+    .attr("x", d => x(d.rate))
+    .attr("y", d => y(d.value))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.value))
+    .attr("fill", function(d,i){return colors[i]})
+    .on("mouseover", showTooltip)
+    .on("mouseout", hideTooltip);
+
+  svg.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  svg.append("g")
+    .attr("class", "y-axis")
+    .call(d3.axisLeft(y));
+
+
+    // <dt id="i-rate-desc"></dt>
+    //     <dt id="h-rate-desc"></dt>
+    //     <dt id="b-rate-desc"></dt>
+    //     <dt id="m-rate-desc"></dt>
+  
+    // update descriptions and rate comparisons:
+    let i_rate = data[0].value;
+    let h_rate = data[1].value;
+    let b_rate = data[2].value;
+    let m_rate = data[3].value;
+    document.getElementById("i-rate-desc").innerHTML = data[0].rate + ": " + i_rate;
+    document.getElementById("h-rate-desc").innerHTML = data[1].rate + ": " + h_rate + ", Inflation Premium: " + (h_rate - i_rate);
+    document.getElementById("b-rate-desc").innerHTML = data[2].rate + ": " + b_rate + ", Inflation Premium: " + (b_rate-i_rate);
+    document.getElementById("m-rate-desc").innerHTML = data[3].rate + ": " + m_rate + ", Inflation Premium: " + (m_rate-i_rate);
 
 }
+
+function showTooltip(d) {
+      const tooltip = document.getElementById("tooltip");
+      tooltip.innerHTML = "Year: " + d.year + ";\n"+d.rate + ": " + d.value;
+      tooltip.style.display = "block";
+      tooltip.style.left = (d3.event.pageX + 5) + "px";
+      tooltip.style.top = (d3.event.pageY - 5) + "px";
+      
+    }
+
+function hideTooltip() {
+  const tooltip = document.getElementById("tooltip");
+  tooltip.style.display = "none";
+}
+
+
+slider.addEventListener("input", updateYearSliderText);
+
+updateYearSliderText();
+
+
+updateLineChartData(dataSets[0]);
+updateTitle(index);
+const scenes = dataSets.length + 1;
+document.getElementById("previous-btn").addEventListener("click", function() {
+      index = (index - 1 + scenes) % scenes;
+      if (index == 0){
+        document.getElementById("previous-btn").style.display = "none";
+
+      }
+      else{
+        document.getElementById("next-btn").style.display = "inline";
+
+        
+      }
+      if (index < 4){
+          updateLineChartData(dataSets[index]);
+      }
+      else{
+        updateBarChart(getBarChartByYear(2022))
+      }
+      updateTitle(index)
+
+    });
+
+document.getElementById("next-btn").addEventListener("click", function() {
+      index = (index + 1) % scenes;
+      if (index == scenes){
+        document.getElementById("next-btn").style.display = "none";
+
+      }
+      
+      else{
+        document.getElementById("previous-btn").style.display = "inline";
+
+        
+      }
+      if (index < 4){
+          updateLineChartData(dataSets[index]);
+        }
+      else{
+        updateBarChart(getBarChartByYear(2022))
+      }
+      updateTitle(index)
+      
+    });
 </script>
 </body>
 </html>
