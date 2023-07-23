@@ -18,7 +18,7 @@
     text-align: center;
   }
 </style>
-<body>
+<body onload='init()'>
     <h1 id = "scene-title">Inflation Rate By Year (1998 - 2022)</h1>
     <div id="tooltip" style="position: absolute; display: none; background-color:white; padding: 5px; border: 2px solid black; font-size: 12px;"></div>
     <svg width=1500 height=600>
@@ -53,12 +53,17 @@ Data set:
 
 */
 let index = 0;
-const data1 = await d3.csv('./inflation.csv');
+let dataSets = [];
 
-const data2 = await d3.csv('./house_rates.csv');
-const data3 = await d3.csv('./tbill_rates.csv');
-const data4 = await d3.csv('./sp500_rates.csv');
-const dataSets = [data1,data2,data3,data4];
+function async init(){
+  const data1 = await d3.csv('./inflation.csv');
+
+  const data2 = await d3.csv('./house_rates.csv');
+  const data3 = await d3.csv('./tbill_rates.csv');
+  const data4 = await d3.csv('./sp500_rates.csv');
+  dataSets = [data1,data2,data3,data4];
+}
+
 const titles = [
     "Inflation Rate By Year",
     "Real Estate Yearly Appreciation Rates Per Year",
