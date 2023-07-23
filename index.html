@@ -15,14 +15,13 @@ async function init() {
 
     d3.select('svg').append('g')
         .attr('transform','translate(50,50)')
+        .selectAll('circle')
         .data(data)
         .enter()
-        .append("rect")
-        .attr("x", function(d) { return x(d.YEAR); })
-        .attr("y", function(d) { return y(d.ROUNDED); })
-        .attr("width", x.bandwidth())
-        .attr("height", function(d) { return height - y(d.Value); })
-        .attr("fill", "#69b3a2")
+        .append('circle')
+        .attr('cx',function(d,i) {return x(+d.YEAR);})
+        .attr('cy',function(d,i) {return y(+d.ROUNDED);})
+
 
     d3.select('svg').append('g')
     .attr('transform','translate(50,50)')
