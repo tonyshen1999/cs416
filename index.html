@@ -21,6 +21,7 @@ async function init() {
         .append('circle')
         .attr('cx',function(d,i) {return x(+d.YEAR);})
         .attr('cy',function(d,i) {return y(+d.ROUNDED);})
+        .attr('r', 1)
 
 
     d3.select('svg').append('g')
