@@ -30,7 +30,27 @@
         <div class="slider-value" id="slider-value">Year: 2022</div>
         <input type="range" min="1998" max="2022" value="2022" step="1" id="year-slider" >
       </div>
+      <hr>
+
+      <label for="investment">Investment Amount</label>
+      <input type="text" value="1000" id="investment" name="inputText" required>
+      <label for="selectOption">Select an option:</label>
+      <select id="selectOption" name="selectOption">
+          <option value="1">Real Estate</option>
+          <option value="2">Government Bonds</option>
+          <option value="3">S&P 500</option>
+          <!-- Add more options as needed -->
+      </select>
+
       
+      <button type="submit" id="calc">Calculate</button>
+      <h1 id = "investment-title"></h1>
+      <svg width=1000 height=600 id="value-chart">
+
+      </svg>
+      <hr>
+      <h3 id="detail-title">Rate Details for 2022</h3>
+  
       <ol>
         <li id="i-rate-desc"></li>
         <li id="h-rate-desc"></li>
@@ -40,6 +60,8 @@
     </div>
     <button id="previous-btn" style="display: none">Previous</button>
     <button id="next-btn">Next</button>
+ 
+
     
 <script>
 /*
@@ -176,8 +198,8 @@ const titles = [
 const captions = [
   "The inflation rate represents how prices in general increase year over year. The data is pulled from FRED Economic Data and originates from the World Bank.",
   "The real estate yearly appreciation rate represents the average rate of increase in property value. The original data pulled from the Federal Housing Finance Agency shows the Housing Price Index (HPI) each year and the appreciate rate is determine by computing the percentage increase in HPI year by year",
-  "The US Government 3 month t bill rate represents the yearly return from investing in a 3 month government t bill. Due to the stability of the US Government, this rate can also be used as a baseline for a relatively risk free rate of return",
-  "The S&P 500 index represents the rate of return from investing in a portfolio comprised of S&P's top 500 companies",
+  "The US Government 3 month t bill rate represents the yearly return from investing in a 3 month government t bill. Due to the stability of the US Government, this rate can also be used as a baseline for a relatively risk free rate of return. These rates are compiled by NYU Stern",
+  "The S&P 500 index represents the rate of return from investing in a portfolio comprised of S&P's top 500 companies. These rates are summarized by MacroTrends.com",
   "This bar chart allows users to focus on a particular year and compare the rates relative to each other. The inflation premium represents the rate of return over the rate of inflation"
 ]
 const slider = document.getElementById("year-slider");
@@ -187,6 +209,11 @@ const sliderValueDisplay = document.getElementById("slider-value");
 function updateYearSliderText() {
       sliderValueDisplay.textContent = "Year: " + slider.value;
       updateBarChart(getBarChartByYear(+slider.value))
+      let investment = document.getElementById("investment").value;
+      let type = document.getElementById("selectOption").value
+      let i_data = invest(+document.getElementById("year-slider").value,+investment, dataSets[+type]);
+      updateValueLineChart(i_data,+investment)
+      document.getElementById("detail-title").innerHTML = "Rate Details for " + slider.value
 }
 
 
@@ -231,7 +258,7 @@ function updateLineChartData(data){
 
     const y = d3.scaleLinear()
       // .domain([d3.min(data, d => d.value), d3.max(data, d => d.value)])
-      .domain([Math.min(-20,d3.min(data, d => d.value)),Math.max(40,d3.max(data, d => d.value))])
+      .domain([Math.min(-40,d3.min(data, d => d.value)),Math.max(40,d3.max(data, d => d.value))])
       .range([height, 0]);
 
     const line = d3.line()
@@ -326,7 +353,7 @@ function updateBarChart(data){
     .padding(0.1);
 
   const y = d3.scaleLinear()
-    .domain([Math.min(d3.min(data, d => d.value)-2,-20), Math.max(d3.max(data, d => d.value),30)])
+    .domain([Math.min(d3.min(data, d => d.value)-2,-40), Math.max(d3.max(data, d => d.value),40)])
     .range([height, 0]);
   // const color = d3.scaleBand()
   //   .domain([data[0].rate,data[1].rate,data[2].rate,data[3].rate])
@@ -372,6 +399,7 @@ function updateBarChart(data){
 
 }
 
+
 function showTooltip(d) {
       const tooltip = document.getElementById("tooltip");
       tooltip.innerHTML = "Year: " + d.year + ";\n"+d.rate + ": " + d.value;
@@ -386,6 +414,20 @@ function hideTooltip() {
   tooltip.style.display = "none";
 }
 
+function invest(i_year, investment, data){
+  
+  let i_data = [{year:+i_year,value:investment}];
+  console.log(i_data)
+  for (let i = 1;i<=2023-i_year;i++){
+    console.log(i+i_year)
+    console.log(i_data[i-1].value*(1+(data[i-1].value)/100))
+    i_data.push({year:(i+i_year),value:(i_data[i-1].value*(1+(data[i-1].value)/100))})
+    
+  }
+  console.log(i_data)
+
+  return i_data
+}
 
 slider.addEventListener("input", updateYearSliderText);
 
@@ -395,6 +437,132 @@ updateYearSliderText();
 updateLineChartData(dataSets[0]);
 updateTitle(index);
 const scenes = dataSets.length + 1;
+
+
+
+function updateBarChart(data){
+
+  const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+  const width = 1000 - margin.left - margin.right;
+  const height = 600 - margin.top - margin.bottom;
+  document.getElementById("slider-container").style.display = "block";
+  d3.select("svg").selectAll("*").remove();
+
+  const svg = d3.select("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  const x = d3.scaleBand()
+    .domain([data[0].rate,data[1].rate,data[2].rate,data[3].rate])
+    .range([0, width])
+    .padding(0.1);
+
+  const y = d3.scaleLinear()
+    .domain([Math.min(d3.min(data, d => d.value)-2,-40), Math.max(d3.max(data, d => d.value),40)])
+    .range([height, 0]);
+  // const color = d3.scaleBand()
+  //   .domain([data[0].rate,data[1].rate,data[2].rate,data[3].rate])
+  //   .range(["orange","red","white","blue"])
+  const colors = ["orange","red","purple","blue"];
+
+  svg.selectAll(".bar")
+    .data(data)
+    .enter().append("rect")
+    .attr("class", "bar")
+    .attr("x", d => x(d.rate))
+    .attr("y", d => y(d.value))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.value))
+    .attr("fill", function(d,i){return colors[i]})
+    .on("mouseover", showTooltip)
+    .on("mouseout", hideTooltip);
+
+  svg.append("g")
+    .attr("class", "x-axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x));
+
+  svg.append("g")
+    .attr("class", "y-axis")
+    .call(d3.axisLeft(y));
+
+
+    // <dt id="i-rate-desc"></dt>
+    //     <dt id="h-rate-desc"></dt>
+    //     <dt id="b-rate-desc"></dt>
+    //     <dt id="m-rate-desc"></dt>
+  
+    // update descriptions and rate comparisons:
+    let i_rate = data[0].value;
+    let h_rate = data[1].value;
+    let b_rate = data[2].value;
+    let m_rate = data[3].value;
+    document.getElementById("i-rate-desc").innerHTML = data[0].rate + ": " + i_rate;
+    document.getElementById("h-rate-desc").innerHTML = data[1].rate + ": " + h_rate + ", Inflation Premium: " + (h_rate - i_rate).toFixed(2);
+    document.getElementById("b-rate-desc").innerHTML = data[2].rate + ": " + b_rate + ", Inflation Premium: " + (b_rate-i_rate).toFixed(2);
+    document.getElementById("m-rate-desc").innerHTML = data[3].rate + ": " + m_rate + ", Inflation Premium: " + (m_rate-i_rate).toFixed(2);
+
+}
+
+function updateValueLineChart(data,investment){
+    var dropdown = document.getElementById("selectOption");
+    document.getElementById("investment-title").innerHTML = "Investment value of " + investment + " dollars starting at year " + data[0].year + " using " + dropdown.options[dropdown.selectedIndex].textContent;
+    const margin = { top: 20, right: 20, bottom: 30, left: 50 };
+    const width = 1000 - margin.left - margin.right;
+    const height = 600 - margin.top - margin.bottom;
+    
+    d3.select("#value-chart").selectAll("*").remove();
+
+    const svg = d3.select("#value-chart")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    const x = d3.scaleLinear()
+      .domain([d3.min(data, d => d.year), d3.max(data, d => d.year)])
+      // .domain([2010,2015])
+      .range([0, width]);
+
+    const y = d3.scaleLinear()
+      // .domain([d3.min(data, d => d.value), d3.max(data, d => d.value)])
+      .domain([Math.min(0,d3.min(data, d => d.value)),Math.max(investment*3,d3.max(data, d => d.value))])
+      .range([height, 0]);
+
+    const line = d3.line()
+      .x(d => x(d.year))
+      .y(d => y(d.value));
+
+
+     
+    
+    // const makeAnnotations = d3.annotation()
+    //   .annotations(marketCrashAnnotation)
+    //   .annotations(covidAnnotation)
+    
+    
+    svg.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-width", 2)
+      .attr("d", line);
+
+    svg.append("g")
+      .attr("class", "x-axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x).tickFormat(d3.format("d")));
+
+    svg.append("g")
+      .attr("class", "y-axis")
+      .call(d3.axisLeft(y));
+    
+    
+}
+
+
 document.getElementById("previous-btn").addEventListener("click", function() {
       index = (index - 1 + scenes) % scenes;
       if (index == 0){
@@ -418,9 +586,12 @@ document.getElementById("previous-btn").addEventListener("click", function() {
 
 document.getElementById("next-btn").addEventListener("click", function() {
       index = (index + 1) % scenes;
-      if (index == scenes){
+      if (index == scenes-1){
         document.getElementById("next-btn").style.display = "none";
-
+        let investment = document.getElementById("investment").value;
+        let type = document.getElementById("selectOption").value
+        let i_data = invest(+document.getElementById("year-slider").value,+investment, dataSets[+type]);
+        updateValueLineChart(i_data,+investment)
       }
       
       else{
@@ -437,6 +608,20 @@ document.getElementById("next-btn").addEventListener("click", function() {
       updateTitle(index)
       
     });
+document.getElementById("calc").addEventListener("click", function() {
+  let investment = document.getElementById("investment").value;
+  let year = document.getElementById("year-slider").value;
+  let type = document.getElementById("selectOption").value
+  
+  console.log(+investment);
+  console.log(+year);
+  
+  let i_data = invest(+year,+investment, dataSets[+type]);
+  
+  console.log(i_data)
+
+  updateValueLineChart(i_data,+investment)
+});
 </script>
 </body>
 </html>
