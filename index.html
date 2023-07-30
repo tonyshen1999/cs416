@@ -26,12 +26,12 @@
     <br>
     <p id ="caption-text"></p>
     <div id="slider-container" style = "display: none">
+      
+      <hr>
       <div class="slider-container" >
         <div class="slider-value" id="slider-value">Year: 2022</div>
         <input type="range" min="1998" max="2022" value="2022" step="1" id="year-slider" >
       </div>
-      <hr>
-
       <label for="investment">Investment Amount</label>
       <input type="text" value="1000" id="investment" name="inputText" required>
       <label for="selectOption">Select an option:</label>
@@ -44,6 +44,7 @@
 
       
       <button type="submit" id="calc">Calculate</button>
+      <hr>
       <h1 id = "investment-title"></h1>
       <svg width=1000 height=600 id="value-chart">
 
@@ -189,18 +190,18 @@ const data4 =
     ];
 const dataSets = [data1,data2,data3,data4];
 const titles = [
-    "Inflation Rate By Year (%)",
-    "Real Estate Yearly Appreciation Rates Per Year (%)",
-    "US Government 3 Month T Bill Rates Per Year (%)",
-    "S&P 500 Index Returns Per Year (%)",
-    "Comparison of Rates (%)"
+    "Inflation Percentage By Year",
+    "Fluctuations of Real Estate Appreciation Percentages By Year",
+    "Fluctuations of US Government 3 Month T Bill Rate Percentages By Year",
+    "Fluctuations of S&P 500 Index Returns Percentages By Year",
+    "Comparison of Rates in Percentages"
 ]
 const captions = [
-  "The inflation rate represents how prices in general increase year over year. The data is pulled from FRED Economic Data and originates from the World Bank.",
-  "The real estate yearly appreciation rate represents the average rate of increase in property value. The original data pulled from the Federal Housing Finance Agency shows the Housing Price Index (HPI) each year and the appreciate rate is determine by computing the percentage increase in HPI year by year",
-  "The US Government 3 month t bill rate represents the yearly return from investing in a 3 month government t bill. Due to the stability of the US Government, this rate can also be used as a baseline for a relatively risk free rate of return. These rates are compiled by NYU Stern",
-  "The S&P 500 index represents the rate of return from investing in a portfolio comprised of S&P's top 500 companies. These rates are summarized by MacroTrends.com",
-  "This bar chart allows users to focus on a particular year and compare the rates relative to each other. The inflation premium represents the rate of return over the rate of inflation"
+  "The inflation rate represents how prices in general increase year over year. It represents the baseline to compare investment returns, where if the investment return is higher than the rate of inflation, then the investment would economically profitable. The data is pulled from FRED Economic Data and originates from the World Bank.",
+  "The real estate yearly appreciation rate represents the average rate of increase in property value. The trend has a moderate levels of volatily and responses to major economic events in comparison to inflation. The original data pulled from the Federal Housing Finance Agency shows the Housing Price Index (HPI) each year and the appreciation rate is determined by computing the percentage increase in HPI year by year",
+  "The US Government 3 month t bill rate represents the yearly return from investing in a 3 month government t bill. This rate is relatively stable as its fluctuation levels are low. Major economic events also don't contribute large impacts to the rate. These rates are compiled by NYU Stern",
+  "The S&P 500 index represents the rate of return from investing in a portfolio comprised of S&P's top 500 companies. This rate is highly volatile as large swings are present in the trends. It is also very reactive to major economic events. These rates are summarized by MacroTrends.com",
+  "This bar chart allows users to focus on a particular year and compare the rates relative to each other."
 ]
 const slider = document.getElementById("year-slider");
 const sliderValueDisplay = document.getElementById("slider-value");
